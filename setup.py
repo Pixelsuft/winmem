@@ -10,7 +10,7 @@ if not sys.platform == 'win32':
     raise OSError('Working ONLY under windows')
 
 
-version = '0.0.2'
+version = '0.0.3'
 readme = ''
 requirements = []
 
@@ -40,7 +40,7 @@ else:
 setup(
     name="winmem",
     author="Pixelsuft",
-    url="https://github.com/Pixelsuft/pygame-android",
+    url="https://github.com/Pixelsuft/winmem",
     project_urls={
         "Readme": "https://github.com/Pixelsuft/winmem/blob/main/README.MD",
         "Example": "https://github.com/Pixelsuft/winmem/blob/main/main.py",
