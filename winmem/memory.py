@@ -175,6 +175,30 @@ class Memory:
         """Read ``size`` bytes at ``address``, returning :class:`.Buffer` object."""
         return Buffer(self.read_process_memory(address, size))
 
+    def read(self, type: Data[T], address: int) -> T:
+        """Read type"""
+        return type.from_bytes(self.read_process_memory(address, type.size))
+
     def write_at(self, address: int, data: bytes) -> int:
         """Write at address"""
         return self.write_process_memory(address, data)
+
+    def write(self, type: Data[T], value: T, address: int) -> int:
+        """Write type"""
+        return self.write_at(address, type.to_bytes(value))
+
+    def read_pointer(self, address: int) -> int:
+        """Read pointer"""
+        return self.read(self.pointer_type, address)
+
+    def write_pointer(self, value: int, address: int) -> int:
+        """Write pointer"""
+        return self.write(self.pointer_type, value, address)
+
+    def read_size(self, address: int) -> int:
+        """Read size"""
+        return self.read(self.size_type, address)
+
+    def write_size(self, value: int, address: int) -> int:
+        """Write size"""
+        return self.write(self.size_type, value, address)

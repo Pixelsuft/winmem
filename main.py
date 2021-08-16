@@ -1,7 +1,7 @@
-from winmem import get_memory
+import winmem
 
 
-memory = get_memory(
+memory = winmem.get_memory(
     process_name='geometrydash'
 )
 
@@ -12,8 +12,8 @@ memory = get_memory(
     val = eval('memory.' + i)
     if type(val) == int:
         val = f'{val} {hex(val)}'
-    print(i, val)'''
+    print(i, val)'''  # Show all values and functions in "Memory" class
 
 print(hex(memory.get_base_address('libcocos2D.dll')))
-memory.inject_dll(r"D:\Program Files\Geometry Dash\adaf-dll1\GDLocalisation.dll")
-print(memory.read_at(6, memory.base_address + 0x2CDF44))
+memory.inject_dll(r"D:\Program Files\Geometry Dash\adaf-dll1\GDLocalisation.dll")  # inject dll
+print(memory.read(winmem.uint32, memory.base_address + 0x2CDF44))  # read address
