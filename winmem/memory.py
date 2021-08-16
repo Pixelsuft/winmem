@@ -1,7 +1,7 @@
 from .imports import *
 from .kernel_utils import _virtual_alloc, _virtual_protect, _kernel32_name, _get_module_proc_address,\
     _read_process_memory, _write_process_memory, _is_wow_64_process, _kernel32_symbols, _load_library_name, \
-    _create_remote_thread, _wait_for_single_object, _virtual_free, get_process_bits_from_handle, _virtual_free
+    _create_remote_thread, _wait_for_single_object, get_process_bits_from_handle, _virtual_free
 
 
 kernel32 = ctypes.windll.kernel32
@@ -186,6 +186,19 @@ class Memory:
     def write(self, type: Data[T], value: T, address: int) -> int:
         """Write type"""
         return self.write_at(address, type.to_bytes(value))
+
+    def resolve_layers(self, *offsets: Sequence[int], module: Optional[str] = None) -> int:
+        """Get address by address or pointers"""
+        offsets: List[int] = list_from(offsets)
+        if module:
+            address = self.get_base_address(module)
+        else:
+            address = self.base_address
+        if offsets:
+            address += offsets.pop(0)
+        for offset in offsets:
+            address = self.read(self.ptr_type, address) + offset
+        return address
 
     def read_pointer(self, address: int) -> int:
         """Read pointer"""

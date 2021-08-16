@@ -269,3 +269,10 @@ class Buffer(metaclass=BufferMeta):
 
     def unwrap(self) -> bytes:
         return self._data
+
+
+def list_from(one_or_seq: Union[T, Iterable[T]]) -> List[T]:
+    try:
+        return list(one_or_seq)
+    except Exception:
+        return [one_or_seq]
