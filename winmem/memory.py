@@ -114,7 +114,7 @@ class Memory:
 
     def free_memory(self, address: int, size: int) -> None:
         """Free memory"""
-        return _virtual_free(self.kernel_process_handle, address, size)
+        return _virtual_free(self.kernel_process_handle, address, size, MEM_RELEASE)
 
     def protect_process_memory(
             self, address: int, size: int, flags = READ | WRITE | EXECUTE,
