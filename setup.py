@@ -10,7 +10,7 @@ if not sys.platform == 'win32':
     raise OSError('Working ONLY under windows')
 
 
-version = '0.0.4'
+version = '0.0.5'
 readme = ''
 requirements = []
 
