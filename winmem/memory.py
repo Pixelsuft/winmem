@@ -200,6 +200,8 @@ class Memory:
             address = self.read(self.ptr_type, address) + offset
         return address
 
+    get_pointer_address = resolve_layers
+
     def read_pointer(self, address: int) -> int:
         """Read pointer"""
         return self.read(self.pointer_type, address)
