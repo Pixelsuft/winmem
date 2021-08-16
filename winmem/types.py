@@ -276,3 +276,48 @@ def list_from(one_or_seq: Union[T, Iterable[T]]) -> List[T]:
         return list(one_or_seq)
     except Exception:
         return [one_or_seq]
+
+
+def cache_by(*names: str) -> Callable[[Callable[..., T]], Callable[..., T]]:
+    """Cache ``function`` result by object's attributes given by ``names``."""
+
+    if not names:
+        raise ValueError("@cache_by requires at least one name to be provided.")
+
+    def decorator(function: Callable[..., T]) -> Callable[..., T]:
+        get_attrs = tuple(attrgetter(name) for name in names)
+
+        name = function.__name__
+
+        if not name.isidentifier():
+            name = f"unnamed_{id(function):x}"
+
+        cached_attr = f"_{name}_cached"
+        cached_by_attr = f"_{name}_cached_by"
+
+        @functools.wraps(function)
+        def wrapper(self, *args, **kwargs) -> T:
+            actual = tuple(get_attr(self) for get_attr in get_attrs)
+
+            try:
+                cached = getattr(self, cached_attr)
+                cached_by = getattr(self, cached_by_attr)
+
+            except AttributeError:
+                pass
+
+            else:
+                if actual == cached_by:
+                    return cached
+
+            result = function(self, *args, **kwargs)
+
+            setattr(self, cached_attr, result)
+            setattr(self, cached_by_attr, actual)
+
+            return result
+
+        return wrapper
+
+    return decorator
+

@@ -10,7 +10,7 @@ if not sys.platform == 'win32':
     raise OSError('Working ONLY under windows')
 
 
-version = '0.0.5'
+version = '0.0.6'
 readme = ''
 requirements = []
 
@@ -45,6 +45,7 @@ setup(
         "Readme": "https://github.com/Pixelsuft/winmem/blob/main/README.MD",
         "Example": "https://github.com/Pixelsuft/winmem/blob/main/main.py",
         "Issue tracker": "https://github.com/Pixelsuft/winmem/issues",
+        "Pull requests": "https://github.com/Pixelsuft/winmem/pulls"
     },
     version=version,
     packages=find_packages(),

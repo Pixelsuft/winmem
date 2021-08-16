@@ -106,7 +106,7 @@ class Memory:
         win32process.TerminateProcess(self.process_handle, exit_code)
         win32api.CloseHandle(self.process_handle)
 
-    def allocate_memory(self, address: int, size: int, flags = READ | WRITE | EXECUTE):
+    def allocate_memory(self, address: int, size: int, flags=READ | WRITE | EXECUTE):
         """Allocate memory"""
         return _virtual_alloc(
             self.kernel_process_handle, address, size, MEM_RESERVE | MEM_COMMIT, PROTECTION_FLAGS[flags]
@@ -117,7 +117,7 @@ class Memory:
         return _virtual_free(self.kernel_process_handle, address, size, MEM_RELEASE)
 
     def protect_process_memory(
-            self, address: int, size: int, flags = READ | WRITE | EXECUTE,
+            self, address: int, size: int, flags=READ | WRITE | EXECUTE,
     ):
         """Protect process memory"""
         old_protect = wintypes.DWORD(0)
@@ -233,3 +233,257 @@ class Memory:
             ctypes.byref(data), len(data), ctypes.byref(bytes_written)
         )
         return bytes_written.value
+
+    def write_type(self, type: Data[T], value: T, *offsets, module: Optional[str] = None) -> T:
+        """Read ``type``, resolving ``*offsets`` to the final address."""
+        return self.write_bytes(Buffer(type.to_bytes(value)), *offsets, module=module)
+
+    def read_bool(self, *offsets, module: Optional[str] = None) -> bool:
+        """Read bool"""
+        return self.read_type(boolean, *offsets, module=module)
+
+    def write_bool(self, value: bool, *offsets, module: Optional[str] = None):
+        """Read bool"""
+        return self.write_type(boolean, value, *offsets, module=module)
+
+    def read_buffer(self, size: int, address: int) -> Buffer:
+        """Read buffer"""
+        return self.read_at(address, size)
+
+    def write_buffer(self, buffer: Buffer, address: int) -> int:
+        """Write buffer"""
+        return self.write_at(address, buffer.unwrap())
+
+    def read_int8(self, address: int) -> int:
+        """Read int8"""
+        return self.read(int8, address)
+
+    def write_int8(self, value: int, address: int) -> int:
+        """Write int8"""
+        return self.write(int8, value, address)
+
+    def read_uint8(self, address: int) -> int:
+        """Read uint8"""
+        return self.read(uint8, address)
+
+    def write_uint8(self, value: int, address: int) -> int:
+        """Write uint8"""
+        return self.write(uint8, value, address)
+
+    def read_int16(self, address: int) -> int:
+        """Read int16"""
+        return self.read(int16, address)
+
+    def write_int16(self, value: int, address: int) -> int:
+        """Write int16"""
+        return self.write(int16, value, address)
+
+    def read_uint16(self, address: int) -> int:
+        """Read uint16"""
+        return self.read(uint16, address)
+
+    def write_uint16(self, value: int, address: int) -> int:
+        """Write uint16"""
+        return self.write(uint16, value, address)
+
+    def read_int32(self, address: int) -> int:
+        """Read int32"""
+        return self.read(int32, address)
+
+    def write_int32(self, value: int, address: int) -> int:
+        """Write int32"""
+        return self.write(int32, value, address)
+
+    def read_uint32(self, address: int) -> int:
+        """Read uint32"""
+        return self.read(uint32, address)
+
+    def write_uint32(self, value: int, address: int) -> int:
+        """Write uint32"""
+        return self.write(uint32, value, address)
+
+    def read_int64(self, address: int) -> int:
+        """Read int64"""
+        return self.read(int64, address)
+
+    def write_int64(self, value: int, address: int) -> int:
+        """Write int64"""
+        return self.write(int64, value, address)
+
+    def read_uint64(self, address: int) -> int:
+        """Read uint64"""
+        return self.read(uint64, address)
+
+    def write_uint64(self, value: int, address: int) -> int:
+        """Write uint64"""
+        return self.write(uint64, value, address)
+
+    @property
+    @cache_by("bits")
+    def byte_type(self) -> Data[int]:
+        return int8
+
+    @property
+    @cache_by("bits")
+    def ubyte_type(self) -> Data[int]:
+        return uint8
+
+    @property
+    @cache_by("bits")
+    def short_type(self) -> Data[int]:
+        return int16
+
+    @property
+    @cache_by("bits")
+    def ushort_type(self) -> Data[int]:
+        return uint16
+
+    @property
+    @cache_by("bits")
+    def int_type(self) -> Data[int]:
+        if self.bits >= 32:
+            return int32
+
+        return int16
+
+    @property
+    @cache_by("bits")
+    def uint_type(self) -> Data[int]:
+        if self.bits >= 32:
+            return uint32
+
+        return uint16
+
+    @property
+    @cache_by("bits")
+    def long_type(self) -> Data[int]:
+        if self.bits >= 64:
+            return int64
+
+        return int32
+
+    @property
+    @cache_by("bits")
+    def ulong_type(self) -> Data[int]:
+        if self.bits >= 64:
+            return uint64
+
+        return uint32
+
+    @property
+    @cache_by("bits")
+    def longlong_type(self) -> Data[int]:
+        return int64
+
+    @property
+    @cache_by("bits")
+    def ulonglong_type(self) -> Data[int]:
+        return uint64
+
+    def read_byte(self, address: int) -> int:
+        """Read byte"""
+        return self.read(self.byte_type, address)
+
+    def write_byte(self, value: int, address: int) -> int:
+        """Write byte"""
+        return self.write(self.byte_type, value, address)
+
+    def read_ubyte(self, address: int) -> int:
+        """Read ubyte"""
+        return self.read(self.ubyte_type, address)
+
+    def write_ubyte(self, value: int, address: int) -> int:
+        """Write ubyte"""
+        return self.write(self.ubyte_type, value, address)
+
+    def read_short(self, address: int) -> int:
+        """Read short"""
+        return self.read(self.short_type, address)
+
+    def write_short(self, value: int, address: int) -> int:
+        """Write short"""
+        return self.write(self.short_type, value, address)
+
+    def read_ushort(self, address: int) -> int:
+        """Read ushort"""
+        return self.read(self.ushort_type, address)
+
+    def write_ushort(self, value: int, address: int) -> int:
+        """Write ushort"""
+        return self.write(self.ushort_type, value, address)
+
+    def read_int(self, address: int) -> int:
+        """Read int"""
+        return self.read(self.int_type, address)
+
+    def write_int(self, value: int, address: int) -> int:
+        """Write int"""
+        return self.write(self.int_type, value, address)
+
+    def read_uint(self, address: int) -> int:
+        """Read uint"""
+        return self.read(self.uint_type, address)
+
+    def write_uint(self, value: int, address: int) -> int:
+        """Write uint"""
+        return self.write(self.uint_type, value, address)
+
+    def read_long(self, address: int) -> int:
+        """Read long"""
+        return self.read(self.long_type, address)
+
+    def write_long(self, value: int, address: int) -> int:
+        """Write long"""
+        return self.write(self.long_type, value, address)
+
+    def read_ulong(self, address: int) -> int:
+        """Read ulong"""
+        return self.read(self.ulong_type, address)
+
+    def write_ulong(self, value: int, address: int) -> int:
+        """Write ulong"""
+        return self.write(self.ulong_type, value, address)
+
+    def read_longlong(self, address: int) -> int:
+        """Read longlong"""
+        return self.read(self.longlong_type, address)
+
+    def write_longlong(self, value: int, address: int) -> int:
+        """Write longlong"""
+        return self.write(self.longlong_type, value, address)
+
+    def read_ulonglong(self, address: int) -> int:
+        """Read ulonglong"""
+        return self.read(self.ulonglong_type, address)
+
+    def write_ulonglong(self, value: int, address: int) -> int:
+        """Write ulonglong"""
+        return self.write(self.ulonglong_type, value, address)
+
+    def read_float32(self, address: int) -> float:
+        """Read float32"""
+        return self.read(float32, address)
+
+    read_float = read_float32
+    read_float.__doc__ = """Read float"""
+
+    def write_float32(self, value: float, address: int) -> int:
+        """Write float32"""
+        return self.write(float32, value, address)
+
+    write_float = write_float32
+    write_float.__doc__ = """Write float"""
+
+    def read_float64(self, address: int) -> float:
+        """Read float64"""
+        return self.read(float64, address)
+
+    read_double = read_float64
+    read_double.__doc__ = """Read double"""
+
+    def write_float64(self, value: float, address: int) -> int:
+        """Write float64"""
+        return self.write(float64, value, address)
+
+    write_double = write_float64
+    write_double.__doc__ = """Write double"""

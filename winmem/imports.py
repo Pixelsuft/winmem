@@ -7,6 +7,7 @@ import itertools
 import enums
 import struct
 from typing import *
+from operator import attrgetter
 import psutil
 import win32api
 import win32con
