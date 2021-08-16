@@ -16,5 +16,5 @@ memory = winmem.get_memory(
 
 print(hex(memory.get_base_address('libcocos2D.dll')))
 memory.inject_dll(r"D:\Program Files\Geometry Dash\adaf-dll1\GDLocalisation.dll")  # inject dll
-print(memory.read(winmem.uint32, memory.base_address + 0x2CDF44))  # read address
+print(memory.read_type(winmem.uint32, 0x2CDF44))  # read address
 print(memory.resolve_layers(0x3222D0, 0x164, 0x39C))  # Get address by pointer

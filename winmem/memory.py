@@ -215,3 +215,11 @@ class Memory:
     def write_size(self, value: int, address: int) -> int:
         """Write size"""
         return self.write(self.size_type, value, address)
+
+    def read_bytes(self, size: int = 0, *offsets, module: Optional[str] = None) -> Buffer:
+        """Read ``size`` bytes, resolving ``*offsets`` to the final address."""
+        return Buffer(self.read_process_memory(self.resolve_layers(*offsets, module=module), size))
+
+    def read_type(self, type: Data[T], *offsets, module: Optional[str] = None) -> T:
+        """Read ``type``, resolving ``*offsets`` to the final address."""
+        return type.from_bytes(self.read_process_memory(self.resolve_layers(*offsets, module=module), type.size))
