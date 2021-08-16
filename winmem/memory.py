@@ -133,7 +133,7 @@ class Memory:
         _read_process_memory(self.kernel_process_handle, address, buffer, size, ctypes.byref(bytes_read))
         return buffer.raw
 
-    def write_process_memory(self, address: int, data: bytes) -> int:
+    def write_process_memory(self, address: int, data) -> int:
         """Write process memory"""
         size = len(data)
         buffer = ctypes.create_string_buffer(data, size)
@@ -223,3 +223,13 @@ class Memory:
     def read_type(self, type: Data[T], *offsets, module: Optional[str] = None) -> T:
         """Read ``type``, resolving ``*offsets`` to the final address."""
         return type.from_bytes(self.read_process_memory(self.resolve_layers(*offsets, module=module), type.size))
+
+    def write_bytes(self, buffer: Buffer, *offsets, module: Optional[str] = None):
+        """Write ``buffer``, resolving ``*offsets`` to the final address."""
+        bytes_written = ctypes.c_size_t(0)
+        data = buffer.into_buffer()
+        _write_process_memory(
+            self.kernel_process_handle, self.resolve_layers(*offsets, module=module),
+            ctypes.byref(data), len(data), ctypes.byref(bytes_written)
+        )
+        return bytes_written.value
