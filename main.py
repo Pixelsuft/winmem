@@ -7,13 +7,13 @@ memory = winmem.get_memory(
 )
 
 
-'''for i in dir(memory):
+for i in dir(memory):
     if i.startswith('__') and i.endswith('__'):
         continue
     val = eval('memory.' + i)
     if type(val) == int:
         val = f'{val} {hex(val)}'
-    print(i, val)'''  # Show all values and functions in "Memory" class
+    print(i, val)  # Show all values and functions in "Memory" class
 
 print('cocos base address', hex(memory.get_base_address('libcocos2D.dll')))  # Find base address of libcocos2d.dll
 memory.inject_dll(r"D:\Program Files\Geometry Dash\adaf-dll1\GDLocalisation.dll")  # Inject dll
@@ -23,6 +23,9 @@ memory.write_bool(True, 0x3222D0, 0x164, 0x39C)  # Write bool by pointer address
 print('nickname string', memory.read_string(memory.get_pointer_address(0x3222D8, 0x108)))  # Read string
 memory.write_string('Pixelsufted', memory.get_pointer_address(0x3222D8, 0x108))  # Write string
 
+# Get all windows names
+for i in memory.get_all_windows(pid_type=2):
+    print('Windows name', winmem.win32gui.GetWindowText(i))
 
 # time.sleep(5)  # Sleep 5 seconds
 # memory.terminate(1337)  # Terminate app with exit code 1337

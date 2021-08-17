@@ -1,3 +1,5 @@
+import win32gui
+
 from .imports import *
 from .kernel_utils import _virtual_alloc, _virtual_protect, _kernel32_name, _get_module_proc_address,\
     _read_process_memory, _write_process_memory, _is_wow_64_process, _kernel32_symbols, _load_library_name, \
@@ -28,10 +30,33 @@ class Memory:
         self.bits = get_process_bits_from_handle(self.kernel_process_handle)
         self.pointer_type = get_pointer_type(self.bits)
         self.size_type = get_size_type(self.bits)
+        self.memory_size = self.get_memory_size()
 
     def init_handle(self, open_args=0x1F0FFF):
         """Open process"""
         return win32api.OpenProcess(open_args, False, self.pid)
+
+    def get_memory_size(self):
+        """Get how many memory using program in bytes"""
+        return self.psutil_process.memory_info().vms
+
+    def refresh_memory_size(self):
+        """Refresh get_memory_size()"""
+        self.memory_size = self.get_memory_size()
+
+    def get_all_windows(self, pid_type: int = 0):
+        """Get all windows attached to this process for win32gui from pywin32"""
+        windows = []
+
+        def enum_handler(hwnd, ctx):
+            ids = win32process.GetWindowThreadProcessId(hwnd)
+            if pid_type == 0 and self.pid in ids or pid_type == 1 and ids[0] == self.pid or\
+                    pid_type == 2 and ids[1] == self.pid:
+                windows.append(hwnd)
+
+        win32gui.EnumWindows(enum_handler, None)
+
+        return tuple(windows)
 
     def get_modules(self):
         """Get modules attached to this process"""
@@ -505,14 +530,9 @@ class Memory:
     def write_string(self, value: str, address: int, alloc_address: int = 0x00, terminate: bool = True):
         """Write string"""
         size_address = address + 16
-
         data = String.to_bytes(value=value, terminate=terminate)
-
         size = len(data)
-
         self.write(self.ptr_type, size, size_address)
-
         if size > 16:
             address = self.allocate_memory(alloc_address, size)
-
         self.write_at(address, data)
