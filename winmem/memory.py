@@ -44,6 +44,10 @@ class Memory:
         """Refresh get_memory_size()"""
         self.memory_size = self.get_memory_size()
 
+    def get_memory_bytes(self, from_value: int = 0, to_value: int = 0):
+        """Get all bytes of memory (with from, to)"""
+        return self.read_process_memory(from_value, to_value if to_value > 0 else self.get_memory_size())
+
     def get_all_windows(self, pid_type: int = 0):
         """Get all windows attached to this process for win32gui from pywin32"""
         windows = []
@@ -537,3 +541,21 @@ class Memory:
             address = self.allocate_memory(address, size)
             self.write(self.ptr_type, size, size_address)
         self.write_at(address, data)
+
+    def find_bytes(self, bytes_list, from_value: int = 0, to_value: int = 0, first_only: bool = False):
+        """Find bytes in memory"""
+        all_memory = self.get_memory_bytes(from_value, to_value)
+        all_addresses = []
+
+        if not type(bytes_list) == bytes:
+            bytes_list = bytes(bytes_list)
+
+        bytes_len = len(bytes_list)
+
+        for i in range(len(all_memory)):
+            if all_memory[i:i + bytes_len] == bytes_list:
+                if first_only:
+                    return i
+                all_addresses.append(i)
+
+        return tuple(all_addresses)
