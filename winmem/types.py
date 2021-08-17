@@ -115,8 +115,8 @@ class String(Data[str]):
     def __init__(self) -> None:
         super().__init__("string", "")
 
-    def from_bytes(self, data: bytes, order: Union[str, ByteOrder] = ByteOrder.NATIVE) -> str:
-        return read_until_terminator(data).decode(ENCODING)
+    def from_bytes(self=None, data: bytes = None, encoding: str = "utf-8", errors: str = "strict") -> str:
+        return read_until_terminator(data).decode(encoding, errors)
 
     def to_bytes(
         self, value: str, order: Union[str, ByteOrder] = ByteOrder.NATIVE, null: bool = True

@@ -494,11 +494,10 @@ class Memory:
         """Read string"""
         size_address = address + 16
         size = self.read(self.ptr_type, size_address)
-        print('xd')
         if size < 16:
             try:
-                return read_until_terminator(self.read_process_memory(address, size)).decode('utf-8', 'strict')
+                return String.from_bytes(data=self.read_process_memory(address, size))
             except UnicodeDecodeError:
                 pass
         address = self.read(self.ptr_type, address)
-        return read_until_terminator(self.read_process_memory(address, size)).decode('utf-8', 'strict')
+        return String.from_bytes(data=self.read_process_memory(address, size))
