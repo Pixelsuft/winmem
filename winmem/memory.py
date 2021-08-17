@@ -489,3 +489,16 @@ class Memory:
 
     write_double = write_float64
     write_double.__doc__ = """Write double"""
+
+    def read_string(self, address: int) -> str:
+        """Read string"""
+        size_address = address + 16
+        size = self.read(self.ptr_type, size_address)
+        print('xd')
+        if size < 16:
+            try:
+                return read_until_terminator(self.read_process_memory(address, size)).decode('utf-8', 'strict')
+            except UnicodeDecodeError:
+                pass
+        address = self.read(self.ptr_type, address)
+        return read_until_terminator(self.read_process_memory(address, size)).decode('utf-8', 'strict')
