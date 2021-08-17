@@ -527,12 +527,15 @@ class Memory:
         address = self.read(self.ptr_type, address)
         return String.from_bytes(data=self.read_process_memory(address, size))
 
-    def write_string(self, value: str, address: int, alloc_address: int = 0x00, terminate: bool = True):
+    def write_string(self, value: str, address: int, terminate: bool = True):
         """Write string"""
-        size_address = address + 16
         data = String.to_bytes(value=value, terminate=terminate)
         size = len(data)
+        size_address = address + 16
         self.write(self.ptr_type, size, size_address)
         if size > 16:
-            address = self.allocate_memory(alloc_address, size)
-        self.write_at(address, data)
+            self.write_at(address, data[:15])
+            address = self.allocate_memory(address + 16, size - 16)
+            self.write_at(address, data[15:])
+        else:
+            self.write_at(address, data)
