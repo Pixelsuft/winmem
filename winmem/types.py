@@ -1,3 +1,5 @@
+import struct
+
 from .imports import *
 
 
@@ -38,8 +40,8 @@ NULL_BYTE = bytes(1)
 T = TypeVar("T")
 
 
-def read_until_terminator(data: bytes, sentinel: int = 0) -> bytes:
-    return cast(bytes, iter(data).take_while(lambda byte: byte != sentinel).collect(bytes))
+def read_until_terminator(data: bytes, terminator: int = 0) -> bytes:
+    return bytes(itertools.takewhile(lambda char: char != terminator, data))
 
 
 class ByteOrder(Enum):
