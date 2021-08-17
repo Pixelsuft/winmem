@@ -119,12 +119,15 @@ class String(Data[str]):
         return read_until_terminator(data).decode(encoding, errors)
 
     def to_bytes(
-        self, value: str, order: Union[str, ByteOrder] = ByteOrder.NATIVE, null: bool = True
+        self=None, value: str = '', terminate: bool = True
     ) -> bytes:
-        if null:
-            return value.encode(ENCODING) + NULL_BYTE
 
-        return value.encode(ENCODING)
+        data = value.encode()
+
+        if terminate:
+            data += NULL_BYTE
+
+        return data
 
 
 def get_int_type(bits: int, signed: bool = False) -> Data[int]:
