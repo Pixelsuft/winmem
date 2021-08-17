@@ -534,8 +534,6 @@ class Memory:
         size_address = address + 16
         self.write(self.ptr_type, size, size_address)
         if size > 16:
-            self.write_at(address, data[:15])
-            address = self.allocate_memory(address + 16, size - 16)
-            self.write_at(address, data[15:])
-        else:
-            self.write_at(address, data)
+            address = self.allocate_memory(address, size)
+            self.write(self.ptr_type, size, size_address)
+        self.write_at(address, data)
